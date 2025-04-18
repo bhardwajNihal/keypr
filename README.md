@@ -19,10 +19,18 @@ Todos :
         iv. secrete phrases✅
 
     4. Backend route for :
-        i. adding pin✅
-        ii. adding card details ✅
-        iii. adding password details
-        iv. adding secret phrases
+        i. adding
+        - pin✅
+        - card details ✅
+        - password details✅
+        - secret phrases
+
+        ii. updating 
+            - passwords
+        iii. delete
+            - cards
+            - passwords
+            - seed phrases.
 
         # testing routes
 
@@ -32,4 +40,4 @@ Todos :
         ii. displaying partial details in the details section
         iii. when clicked, displaying popup for entering pin
         iv. once pin is validated, showing full card details.
-        v. adding copy options to each details
+        v. adding copy,delete,update options.
