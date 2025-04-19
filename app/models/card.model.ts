@@ -9,4 +9,4 @@ const cardSchema = new mongoose.Schema({
     cvv : {type:String, required:true, trim:true}
 },{timestamps:true});
 
-export const Card = mongoose.models.cards || mongoose.model("Card", cardSchema);
+export const Card = mongoose.models.Card || mongoose.model("Card", cardSchema);

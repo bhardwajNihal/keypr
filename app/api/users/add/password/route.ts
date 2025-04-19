@@ -16,7 +16,6 @@ export async function POST(req: NextRequest) {
 
     //zod schema
     const validInput = z.object({
-      userId: z.string().min(1, "userId is required!"),
       site: z
         .string()
         .min(1, "site/app name is required!")
@@ -27,14 +26,7 @@ export async function POST(req: NextRequest) {
         .max(100, "Username is too long!"),
       password: z
         .string()
-        .min(8, "Password must be at least 8 characters long")
-        .regex(/[A-Z]/, "Password must include at least one uppercase letter")
-        .regex(/[a-z]/, "Password must include at least one lowercase letter")
-        .regex(/\d/, "Password must include at least one number")
-        .regex(
-          /[@$!%*?&]/,
-          "Password must include at least one special character"
-        ),
+        .min(6, "password too short!")
     });
 
     const reqBody = await req.json();
@@ -51,13 +43,14 @@ export async function POST(req: NextRequest) {
     // once input is successfully validated
     const { site, username, password } = reqBody;
 
-    // hash password
+    // encrypt sensitive data
+    const encryptedUsername = encrypt(username)
     const encryptedPassword = encrypt(password)
     // entry to db
     await Password.create({
       userId,
       site,
-      username,
+      username:encryptedUsername,
       password: encryptedPassword,
     });
 

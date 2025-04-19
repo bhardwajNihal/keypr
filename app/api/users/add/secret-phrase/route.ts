@@ -19,7 +19,6 @@ export async function POST(req: NextRequest) {
 
     //zod schema
     const validInput = z.object({
-      userId: z.string().min(1, "userId is required!"),
       walletName: z
         .string()
         .min(1, "walletName is required!")

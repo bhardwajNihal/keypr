@@ -43,19 +43,38 @@ Todos :
 - So, these are about some security related stuffs that I explored in course of making this project.
 
     => no need for update routes.
-    *Most users don’t update passwords or card details, passwords and in here, the secret phrases, it's better delete and readd with fresh info, atleast what I think.
+    *Most users don’t update passwords or card details, passwords and in here, the secret phrases, it's better delete and readadd with fresh info, atleast what I think.
      |**remaining routes:
      |   ii. delete
      |       - cards✅
      |       - password✅
      |       - seed phrases.✅
+     |
+     |* Routes to get the infos from the db
+     |  i. /preview - for partial details, in the list of added items
+     |      - /cards✅
+     |      - /passwords✅
+     |      - /secret-phrases✅
+     |  ii. /details - for detailed info for the added item, only to be shown once pin is validated
+     |      - /card/:id  
+     |      - /password/:id
+     |      - /secret-phrase/:id
 
-        # testing routes
+        # testing routes ✅
 
 // frontend
-    1. Card 
-        i. adding details using react hook form
+        i. react hook form form validation for : 
+            - card✅
+            - password✅
+            - phrase✅
         ii. displaying partial details in the details section
         iii. when clicked, displaying popup for entering pin
         iv. once pin is validated, showing full card details.
         v. adding copy,delete,update options.
+
+    # Finally 
+        -Reset pin functionality, 
+        - email setup >> nodemailer >> random hash is generated >> stored in db >> sent to the email
+        - route to send email
+            - 1st session is validated >> custom reset-token validated
+            - after all the validation >> the pin is finally reset. 

@@ -8,4 +8,4 @@ const passwordSchema = new mongoose.Schema({
     password : {type:String, required:true,trim:true},
 },{timestamps:true});
 
-export const Password = mongoose.models.passwords || mongoose.model("Password",passwordSchema);
+export const Password = mongoose.models.Password || mongoose.model("Password",passwordSchema);

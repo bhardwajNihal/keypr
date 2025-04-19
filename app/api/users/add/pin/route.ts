@@ -17,7 +17,6 @@ export async function POST(req: NextRequest) {
 
     //zod schema
     const validInput = z.object({
-      userId: z.string().min(1, "UserId is required"),
       pin: z.string().length(4).regex(/^\d+$/, "PIN must be numeric"),
     });
 

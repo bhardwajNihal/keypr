@@ -6,4 +6,4 @@ const secretPhraseSchema = new mongoose.Schema({
     phrase : {type:String, required:true, trim:true},
 }, {timestamps:true});
 
-export const SecretPhrase = mongoose.models.secretephrases || mongoose.model("SecretPhrase",secretPhraseSchema);
+export const SecretPhrase = mongoose.models.SecretPhrase || mongoose.model("SecretPhrase",secretPhraseSchema);
