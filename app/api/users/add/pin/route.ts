@@ -3,10 +3,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import { ConnectToDB } from "@/app/Db/dbConnection";
+import { auth } from "@clerk/nextjs/server";
 ConnectToDB();
 
 export async function POST(req: NextRequest) {
   try {
+
+    // check for valid session
+        const {userId} = await auth();
+        if(!userId){
+          return NextResponse.json({message : "Request unauthorized! Please Login!"}, {status:401});
+        }
+
+    //zod schema
     const validInput = z.object({
       userId: z.string().min(1, "UserId is required"),
       pin: z.string().length(4).regex(/^\d+$/, "PIN must be numeric"),
@@ -23,9 +32,8 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    // once the input is validated >> hash >> store/update to db
-    const { userId, pin } = reqBody;
-    const hashedPin = await bcrypt.hash(pin, 10);
+    // once the input is validated >> hash >> store
+    const { pin } = reqBody;
 
     //check if pin for the user already exists
     const foundPin = await Pin.findOne({ userId });
@@ -33,6 +41,8 @@ export async function POST(req: NextRequest) {
     if (foundPin) {
       return NextResponse.json({ message: "pin is already set!" });
     }
+
+    const hashedPin = await bcrypt.hash(pin, 10);
 
     await Pin.create({
       userId,

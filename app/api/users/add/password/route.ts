@@ -2,11 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { ConnectToDB } from "@/app/Db/dbConnection";
 import { Password } from "@/app/models/password.model";
-import bcrypt from "bcrypt";
+import { encrypt } from "@/lib/cryptoUtils";
+import { auth } from "@clerk/nextjs/server";
 ConnectToDB();
 
 export async function POST(req: NextRequest) {
   try {
+    // check for valid session
+        const {userId} = await auth();
+        if(!userId){
+          return NextResponse.json({message : "Request unauthorized! Please Login!"}, {status:401});
+        }
+
     //zod schema
     const validInput = z.object({
       userId: z.string().min(1, "userId is required!"),
@@ -42,16 +49,16 @@ export async function POST(req: NextRequest) {
     }
 
     // once input is successfully validated
-    const { userId, site, username, password } = reqBody;
+    const { site, username, password } = reqBody;
 
     // hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const encryptedPassword = encrypt(password)
     // entry to db
     await Password.create({
       userId,
       site,
       username,
-      password: hashedPassword,
+      password: encryptedPassword,
     });
 
     return NextResponse.json(

@@ -2,15 +2,22 @@ import { z } from "zod";
 import { ConnectToDB } from "@/app/Db/dbConnection";
 import { NextRequest, NextResponse } from "next/server";
 import { Card } from "@/app/models/card.model";
-import bcrypt from "bcrypt";
+import { encrypt } from "@/lib/cryptoUtils";
+import { auth } from "@clerk/nextjs/server";
 
 ConnectToDB();
 
 export async function POST(req: NextRequest) {
   try {
+
+    // check for valid session
+    const {userId} = await auth();
+    if(!userId){
+      return NextResponse.json({message : "Request unauthorized! Please Login!"}, {status:401});
+    }
+
     // zod schema
     const validInput = z.object({
-      userId: z.string().min(1, "userId is required!"),
       name: z
         .string()
         .min(3, "Name should be atleast of 3 characters!")
@@ -35,7 +42,7 @@ export async function POST(req: NextRequest) {
     }
 
     // once the input is safely validated
-    const { userId, name, cardNumber, expiry, cvv } = reqBody;
+    const { name, cardNumber, expiry, cvv } = reqBody;
 
     // check if card already added
 
@@ -48,18 +55,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    //hash the number, and cvv
-    const hashedCardNumber = await bcrypt.hash(cardNumber, 10);
-    const hashedExpiry = await bcrypt.hash(expiry, 10);
-    const hashedCvv = await bcrypt.hash(cvv, 10);
+    // encrypting the sensitive data
+    const encryptedCardNumber = encrypt(cardNumber);
+    const encryptedExpiry = encrypt(expiry);
+    const encryptedCvv = encrypt(cvv)
 
     // finally add entry to db
     await Card.create({
       userId,
       name,
-      cardNumber: hashedCardNumber,
-      expiry : hashedExpiry,
-      cvv: hashedCvv,
+      cardNumber: encryptedCardNumber,
+      expiry : encryptedExpiry,
+      cvv: encryptedCvv,
     });
 
     return NextResponse.json(

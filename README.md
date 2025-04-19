@@ -19,18 +19,36 @@ Todos :
         iv. secrete phrases✅
 
     4. Backend route for :
-        i. adding
-        - pin✅
-        - card details ✅
-        - password details✅
-        - secret phrases
 
-        ii. updating 
-            - passwords
-        iii. delete
-            - cards
-            - passwords
-            - seed phrases.
+** No manual auth middleware, the session verification is managed the clerk right out of the box.
+    Clerk stores session as a secure HttpOnly cookie
+    This cookie is automatically included in every request from your frontend
+    Clerk's server SDK (auth()) reads & validates this behind the scenes
+    >> just using the method ==> const {userId} = auth() --> provided by clerk
+
+      |  i. adding
+      |  - pin✅     (hashing is enough)
+      |  - card details ✅       (needs encryption-decryption)
+      |  - password details✅    (needs encryption-decryption)
+      |  - secret phrases✅      (needs encryption-decryption)
+
+# NOTE: For the sensitive info that needs back to be shown to the user, hashing isn't enough.
+- we have to encrypt it before saving it the db, and dcrypt only if certain criteria is fulfilled to make is safe. (i.e. user must be logged in and have entered correct pin).
+- though server side encrypt is not the best option, but in a project of this scale, encryption, along with auth and pin makes is a solid approach.
+- End-to-End encryption is followed, where the data security is of atmost priority. 
+- Or even in server side encryption in serious production systems:
+    - Keys are stored in restricted secret vaults
+    - Only the app runtime can access them
+    - Developers are audited/logged, and keys are rotated frequently
+- So, these are about some security related stuffs that I explored in course of making this project.
+
+    => no need for update routes.
+    *Most users don’t update passwords or card details, passwords and in here, the secret phrases, it's better delete and readd with fresh info, atleast what I think.
+     |**remaining routes:
+     |   ii. delete
+     |       - cards✅
+     |       - password✅
+     |       - seed phrases.✅
 
         # testing routes
 
