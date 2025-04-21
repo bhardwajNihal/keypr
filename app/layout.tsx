@@ -7,6 +7,7 @@ import './globals.css'
 import Navbar from './navbar/nav'
 import { ThemeProvider } from './components/theme-provider'
 import Footer from './footer/footer'
+import {Toaster} from "react-hot-toast"
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -39,6 +40,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
           <Navbar />
+          <Toaster/>
           {children}
           <Footer/>
           </ThemeProvider>

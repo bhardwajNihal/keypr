@@ -18,7 +18,8 @@ export async function POST(req: NextRequest) {
 
     // zod schema
     const validInput = z.object({
-      name: z
+      title : z.string().min(1,"title is required!").max(100,"title too long!"),
+        CardHolderName: z
         .string()
         .min(3, "Name should be atleast of 3 characters!")
         .max(100, "Name is too long!"),
@@ -42,18 +43,7 @@ export async function POST(req: NextRequest) {
     }
 
     // once the input is safely validated
-    const { name, cardNumber, expiry, cvv } = reqBody;
-
-    // check if card already added
-
-    const isCardAdded = await Card.findOne({ cardNumber });
-
-    if (isCardAdded) {
-      return NextResponse.json(
-        { message: "Card already added!" },
-        { status: 400 }
-      );
-    }
+    const { title, CardHolderName, cardNumber, expiry, cvv } = reqBody;
 
     // encrypting the sensitive data
     const encryptedCardNumber = encrypt(cardNumber);
@@ -63,7 +53,8 @@ export async function POST(req: NextRequest) {
     // finally add entry to db
     await Card.create({
       userId,
-      name,
+      title,
+      CardHolderName,
       cardNumber: encryptedCardNumber,
       expiry : encryptedExpiry,
       cvv: encryptedCvv,

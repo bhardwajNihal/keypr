@@ -66,10 +66,10 @@ export default function VaultTabs() {
       </div>
 
       {/* Content */}
-      <div className="p-6 border rounded-b-lg shadow-sm bg-background mt-2 mb-8 h-screen">
+      <div className="p-4 border rounded-b-lg shadow-sm bg-background mt-2 mb-8 h-screen">
         {activeTab === 'Passwords' && (
-          <div className='h-full w-full'>
-            <h2>Add and view your saved site credentials here.</h2>
+          <div className='h-full w-full pb-8'>
+            <h2 className='text-lg font-medium text-muted-foreground px-4 mb-2'>Add and view your saved site credentials here.</h2>
             <div className='flex gap-4 p-2 h-full w-full'>
               <AddPasswordForm />
               <AddedPasswords />
@@ -77,8 +77,8 @@ export default function VaultTabs() {
           </div>
         )}
         {activeTab === 'Cards' && (
-          <div className='h-full w-full'>
-            <h2>Securely manage your credit/debit cards.</h2>
+          <div className='h-full w-full pb-8'>
+            <h2 className='text-muted-foreground text-lg font-medium px-4 mb-2'>Securely manage your credit/debit cards.</h2>
             <div className='flex gap-4 p-2 h-full w-full'>
               <AddCardForm />
               <AddedCards />
@@ -86,8 +86,8 @@ export default function VaultTabs() {
           </div>
         )}
         {activeTab === 'Secret Phrases' && (
-          <div className='h-full w-full'>
-          <h2>Store your crypto wallet seed phrases safely.</h2>
+          <div className='h-full w-full pb-8'>
+          <h2 className='text-lg font-medium text-muted-foreground px-4 mb-2'>Store your crypto wallet seed phrases safely.</h2>
           <div className='flex gap-4 p-2 h-full w-full'>
             <AddSecretForm />
             <AddedSecrets />

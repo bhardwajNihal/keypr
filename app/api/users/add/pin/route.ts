@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     const foundPin = await Pin.findOne({ userId });
 
     if (foundPin) {
-      return NextResponse.json({ message: "pin is already set!" });
+      return NextResponse.json({ message: "pin already exists!" });
     }
 
     const hashedPin = await bcrypt.hash(pin, 10);
@@ -49,12 +49,12 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(
-      { message: "Pin set Successfully!" },
+      { message: "Pin generated Successfully!" },
       { status: 200 }
     );
   } catch (error) {
     return NextResponse.json(
-      { message: "Error setting Pin!", error: error },
+      { message: "Error generating Pin!", error: error },
       { status: 500 }
     );
   }

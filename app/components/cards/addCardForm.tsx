@@ -1,11 +1,14 @@
 'use client'
 import axios from "axios";
-import React from "react"
+import React, { useRef, useState } from "react"
 import { useForm } from "react-hook-form"
+import toast from "react-hot-toast";
+import { ClipLoader } from "react-spinners";
 
 
 interface FormValues {
-  name: string;
+  title: string;
+  CardHolderName: string;
   cardNumber: string;
   expiryMonth: string;
   expiryYear: string;
@@ -14,45 +17,69 @@ interface FormValues {
 
 const AddCardForm = () => {
 
+  const yearRef = useRef<HTMLInputElement>(null);
+  const cvvRef = useRef<HTMLInputElement>(null)
+
+  const [loading, setLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset
   } = useForm<FormValues>()
 
   const onSubmit = async(data: FormValues) => {
     // modifying the payload before hitting your backend API to match the expected format
     const payload = {
-      name: data.name,
+      title : data.title,
+      CardHolderName: data.CardHolderName,
       cardNumber: data.cardNumber,
       expiry: `${data.expiryMonth}${data.expiryYear}`,
       cvv: data.cvv,
     };
-    console.log("Form Submitted:", payload);
+    // console.log("Form Submitted:", payload);
     // finally making API call
     try {
+      setLoading(true);
       const res = await axios.post("/api/users/add/card",payload);
-      alert(res.data.message);
+      reset()
+      toast.success(res.data.message);
+      setLoading(false);
     } catch (error) {
       console.error("error submitting form data!, ERROR : ",error);
-      alert("Error submitting form data!");
+      toast.error("Error submitting form data!");
+      setLoading(false);
     }
   }
 
   return (
-    <div className='border border-gray-800 h-full w-full md:w-2/5 rounded'>
+    <div className='shadow shadow-purple-900 h-fit w-full md:w-2/5 rounded p-2 sm:p-4'>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
+
+      <div>
+        <p>title</p>
           <input
-            {...register("name", { required: "Name is required", minLength: 3 })}
-            placeholder="Cardholder Name"
-            className="border p-2 w-full rounded"
+            {...register("title", { required: "title is required", minLength: 2 })}
+            placeholder="Sbi debit card..."
+            className="border bg-background p-2 w-full rounded placeholder:text-sm"
           />
-          {errors.name && <p className="text-red-500">{errors.name.message}</p>}
+          {errors.title && <p className="text-red-800 text-xs sm:text-sm">{errors.title.message}</p>}
         </div>
 
         <div>
+          <p>card holder name</p>
+          <input
+            {...register("CardHolderName", { required: "Card holder name is required", minLength: 3 })}
+            placeholder="Nihal Bhardwaj"
+            className="border bg-background p-2 w-full rounded placeholder:text-sm"
+          />
+          {errors.CardHolderName && <p className="text-red-800 text-xs sm:text-sm">{errors.CardHolderName.message}</p>}
+        </div>
+
+        <div>
+          <p>card number</p>
           <input
             {...register("cardNumber", {
               required: "Card number is required",
@@ -61,13 +88,15 @@ const AddCardForm = () => {
                 message: "Card number must be 12 to 19 digits",
               },
             })}
-            placeholder="Card Number"
-            className="border p-2 w-full rounded"
+            type="number"
+            placeholder="1234 3456 5678 1234"
+            className="border bg-background p-2 w-full rounded placeholder:text-sm"
           />
-          {errors.cardNumber && <p className="text-red-500">{errors.cardNumber.message}</p>}
+          {errors.cardNumber && <p className="text-red-800 text-xs sm:text-sm">{errors.cardNumber.message}</p>}
         </div>
 
-        <div className="flex space-x-2">
+        <p>expiry</p> 
+        <div className="flex items-center gap-2">
           <input
             {...register("expiryMonth", {
               required: "Month is required",
@@ -76,9 +105,15 @@ const AddCardForm = () => {
                 message: "Month must be between 01 and 12",
               },
             })}
+            inputMode="numeric"
+            type="number"
             placeholder="MM"
-            className="border p-2 rounded w-16"
+            className="border bg-background p-2 rounded w-16 placeholder:text-sm"
+            onInput={(e:React.ChangeEvent<HTMLInputElement>) => {
+              if(e.target.value.length ===2) yearRef.current?.focus()
+            }}
           />
+          <span className="text-muted-foreground">/</span>
           <input
             {...register("expiryYear", {
               required: "Year is required",
@@ -86,13 +121,20 @@ const AddCardForm = () => {
                 parseInt(value) >= parseInt(new Date().getFullYear().toString().slice(-2)) ||
                 "Year must be this year or later",
             })}
+            inputMode="numeric"
+            type="number"
             placeholder="YY"
-            className="border p-2 rounded w-16"
+            className="border bg-background p-2 rounded w-16 placeholder:text-sm"
+            onInput={(e:React.ChangeEvent<HTMLInputElement>) => {
+              if(e.target.value.length===2) cvvRef.current?.focus();
+            }}
+            ref={yearRef}
           />
         </div>
-        {(errors.expiryYear || errors.expiryMonth) && <p className="text-red-500">{errors.expiryYear?.message || errors.expiryMonth?.message}</p>}
+        {(errors.expiryYear || errors.expiryMonth) && <p className="text-red-800 text-xs sm:text-sm">{errors.expiryYear?.message || errors.expiryMonth?.message}</p>}
 
         <div>
+          <p>cvv</p>
           <input
             {...register("cvv", {
               required: "CVV is required",
@@ -101,17 +143,19 @@ const AddCardForm = () => {
                 message: "CVV must be 3 or 4 digits",
               },
             })}
-            placeholder="CVV"
-            className="border p-2 w-full rounded"
+            type="number"
+            placeholder="123"
+            className="border bg-background p-2 w-full rounded placeholder:text-sm"
+            ref={cvvRef}
           />
-          {errors.cvv && <p className="text-red-500">{errors.cvv.message}</p>}
+          {errors.cvv && <p className="text-red-800 text-xs sm:text-sm">{errors.cvv.message}</p>}
         </div>
 
         <button
           type="submit"
-          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+          className="w-full text-white px-4 py-2 rounded bg-purple-800 hover:bg-purple-700"
         >
-          Submit
+          {(loading) ? <ClipLoader size={"12px"} color="white"/> : "Add Card"}
         </button>
       </form>
 

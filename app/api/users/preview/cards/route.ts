@@ -17,7 +17,7 @@ export async function GET() {
     
         //once validated fetch the added cards from the db
     
-        const res = await Card.find({userId}).select("-userId -createdAt -updatedAt");
+        const res = await Card.find({userId}).select("-userId -CardHolderName -createdAt -updatedAt");
     
         // now, decrypt the encrpypted info
             // then mask sensitive info for preview
@@ -26,7 +26,7 @@ export async function GET() {
             const expiry = decrypt(cardItem.expiry);
             const cvv = decrypt(cardItem.cvv);
     
-            const maskedCardNum = cardNum.replace(/\d(?=\d{4})/g, "*"); // replace all those digits with star, who have 4 digits to the left
+            const maskedCardNum = cardNum.replace(/\d(?=\d{4})/g, "x"); // replace all those digits with star, who have 4 digits to the left
             let maskedCvv;
     
             if(cvv.length===3){
@@ -38,7 +38,7 @@ export async function GET() {
             //finally returning the info in the form in which to be previewed
             return {
                 _id : cardItem._id,
-                name : cardItem.name,
+                title : cardItem.title,
                 cardNumber : maskedCardNum,
                 expiry,
                 cvv : maskedCvv

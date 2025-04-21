@@ -1,7 +1,9 @@
 'use client'
 import axios from "axios";
-import React from "react"
+import React, { useState } from "react"
 import { useForm } from "react-hook-form"
+import toast from "react-hot-toast";
+import { ClipLoader } from "react-spinners";
 
 
 interface FormValues {
@@ -11,10 +13,13 @@ interface FormValues {
 
 const AddSecretForm = () => {
 
+  const [loading, setLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset
   } = useForm<FormValues>()
 
   const onSubmit = async(data: FormValues) => {
@@ -22,16 +27,20 @@ const AddSecretForm = () => {
     console.log("Form Submitted:", data);
     // finally making API call
     try {
+      setLoading(true)
       const res = await axios.post("/api/users/add/secret-phrase",data);
-      alert(res.data.message);
+      toast.success(res.data.message);
+      setLoading(false)
+      reset()
     } catch (error) {
       console.error("error submitting form data!, ERROR : ",error);
-      alert("Error submitting form data!");
+      toast.error("Error submitting form data!");
+      setLoading(false)
     }
   }
 
   return (
-    <div className='border border-gray-800 h-full w-full md:w-2/5 rounded'>
+    <div className='shadow shadow-purple-900 h-fit w-full md:w-2/5 rounded p-2 sm:p-4'>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
@@ -45,11 +54,11 @@ const AddSecretForm = () => {
         </div>
 
         <div>
-          <input
+          <textarea
             {...register("phrase", {
               required: "Secret phrase is required!",
             })}
-            placeholder="adapt bridge cat ..."
+            placeholder="adapt bridge cat .... .... ...."
             className="border p-2 w-full rounded"
           />
           {errors.phrase && <p className="text-red-500">{errors.phrase.message}</p>}
@@ -57,9 +66,9 @@ const AddSecretForm = () => {
 
         <button
           type="submit"
-          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+          className="w-full text-white px-4 py-2 rounded bg-purple-800 hover:bg-purple-700"
         >
-          Submit
+          {(loading) ? <ClipLoader size={"12px"} color="white"/> : "Add"}
         </button>
       </form>
 

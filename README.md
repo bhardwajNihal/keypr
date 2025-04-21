@@ -51,14 +51,23 @@ Todos :
      |       - seed phrases.✅
      |
      |* Routes to get the infos from the db
-     |  i. /preview - for partial details, in the list of added items
+     |  iii. /preview - for partial details, in the list of added items
      |      - /cards✅
      |      - /passwords✅
      |      - /secret-phrases✅
-     |  ii. /details - for detailed info for the added item, only to be shown once pin is validated
+     
+     |  iv. /generate-pin✅
+
+     >> UI for added creds list✅
+     |
+     |  v. /details - for detailed info for the added item, only to be shown once pin is validated
      |      - /card/:id  
      |      - /password/:id
      |      - /secret-phrase/:id
+
+        ** forgot pin  
+
+        ** Ui tweekings
 
         # testing routes ✅
 
