@@ -39,7 +39,7 @@ const AddPasswordForm = () => {
   }
 
   return (
-    <div className='shadow shadow-purple-900 h-fit p-2 sm:p-4 w-full md:w-2/5 rounded'>
+    <div className='shadow shadow-purple-900 h-fit p-2 sm:p-4 w-full md:w-2/5 mb-4 rounded'>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>

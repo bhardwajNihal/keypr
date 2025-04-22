@@ -3,26 +3,34 @@ import React, { useEffect, useState } from 'react'
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import { GoTrash } from "react-icons/go";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '../ui/input-otp';
+import { REGEXP_ONLY_DIGITS } from 'input-otp';
+// import toast from "react-hot-toast";
 
-
-interface passwordPreviewType{
-  _id : string,
-  site : string,
+interface passwordPreviewType {
+  _id: string,
+  site: string,
   username: string,
-  password : string
+  password: string
 }
 
 const AddedPasswords = () => {
 
-  const [passwords, setpasswords] = useState<passwordPreviewType[]>([])
+  const [pin, setPin] = useState("");
+  const [passwordId, setPasswordId] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [passwords, setPasswords] = useState<passwordPreviewType[]>([])
   const [loading, setLoading] = useState(false);
+  const [isDetailsLoading, setIsDetailsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function fetchPasswords() {
       try {
         setLoading(true)
         const res = await axios.get("/api/users/preview/passwords");
-        setpasswords(res.data.passwords);
+        setPasswords(res.data.passwords);
         setLoading(false);
       } catch (error) {
         console.error("error fetching passwords!, ERROR : ", error);
@@ -32,45 +40,107 @@ const AddedPasswords = () => {
     fetchPasswords();
   }, [])
 
+  useEffect(() => {
+    if(pin.length===4 && passwordId!==null){
+      async function fetchDetails() {
+        try {
+          setIsDetailsLoading(true);
+          const res = await axios.post(`/api/users/details/password/${passwordId}`,{pin},{ validateStatus: () => true })
+          console.log(res);
+          if (res.status !== 200) {
+            setError(res.data.message)
+            setPin("");
+            setIsDetailsLoading(false);
+            return;
+          };
+          setPin("");
+          setPasswordId("");
+          setIsOpen(false);
+          setIsDetailsLoading(false);
+        } catch (error) {
+          console.error("Error fetching password details", error);
+          setPin("");
+          setPasswordId("");
+          setIsOpen(false);
+          setIsDetailsLoading(false);
+        }
+      }
+      fetchDetails();
+    }
+  },[pin,passwordId])
+
   // useEffect(() => {
   //   console.log(passwords);
   // }, [passwords])
 
   return (
-    <div className='shadow-sm shadow-purple-900 h-full w-full md:w-3/5 rounded px-2 sm:px-4 pb-4 flex flex-col gap-3 overflow-hidden overflow-y-auto relative'>
-      
+    <div className='shadow-sm shadow-purple-900 h-screen w-full md:w-3/5 rounded px-2 sm:px-4 pb-4 flex flex-col gap-3 overflow-hidden overflow-y-auto relative'>
+
       <h2 className="font-semibold text-lg sticky top-0 py-3 bg-background/30 z-50 backdrop-blur-xl">Added Passwords</h2>
 
-      {loading && <div className="text-center mt-12"><ClipLoader size={"30px"} color="gray"/></div>}
-      {passwords && passwords.length>0 && !loading
-      ? passwords.map((password) => 
-        <div
-      key={password._id}
-      className="relative shadow-sm shadow-purple-900 hover:shadow-lg w-full rounded-2xl p-4 bg-card border border-border shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer"
-    >
-      {/* Lock Icon */}
-      <div className="absolute top-4 left-4 text-muted-foreground group-hover:text-foreground transition-colors">
-        <RiLock2Fill size={20} />
-      </div>
-    
-      {/* Delete Icon */}
-      <button className="absolute top-3 right-3 text-muted-foreground hover:text-destructive transition">
-        <GoTrash size={18} />
-      </button>
-    
-      {/* Content */}
-      <div className="pl-8 pr-3 pt-2">
-        <h2 className="text-lg font-semibold text-foreground">{password.site}</h2>
-    
-        <div className="mt-2 flex justify-between items-center text-sm sm:text-base text-muted-foreground">
-          <span className="truncate max-w-[60%]">username: <span className="font-mono">{password.username}</span></span>
-          <span className="font-mono">password: {password.password}</span>
-        </div>
-      </div>
-    </div>)
-      : !loading && <div className="text-center mt-8 text-muted-foreground/60">No Credentials added yet!</div>  
-    }
+      {loading && <div className="text-center mt-12"><ClipLoader size={"30px"} color="gray" /></div>}
+      {passwords && passwords.length > 0 && !loading
+        ? passwords.map((password) =>
+          <div
+            onClick={() => {
+              setIsOpen(true)
+              setPasswordId(password._id)
+            }}
+            key={password._id}
+            className="relative shadow-sm shadow-purple-900 hover:shadow-lg w-full rounded-2xl p-2 sm:p-4 bg-card border border-border shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer"
+          >
+            {/* Lock Icon */}
+            <div className="absolute top-4 left-4 text-muted-foreground group-hover:text-foreground transition-colors">
+              <RiLock2Fill size={20} />
+            </div>
 
+            {/* Delete Icon */}
+            <button className="absolute top-3 right-3 text-muted-foreground hover:text-destructive transition">
+              <GoTrash size={18} />
+            </button>
+
+            {/* Content */}
+            <div className="pl-8 pr-3 pt-2">
+              <h2 className="text-lg font-semibold text-foreground">{password.site}</h2>
+
+              <div className="mt-2 sm:flex justify-between items-center text-sm text-muted-foreground">
+                <div className=""><span className="text-xs text-muted-foreground/50">username : </span>{password.username}</div>
+                <div className="font-mono"><span className="text-xs text-muted-foreground/50">pwd : </span>{password.password}</div>
+              </div>
+            </div>
+          </div>)
+        : !loading && <div className="text-center mt-8 text-muted-foreground/60">No Credentials added yet!</div>
+      }
+
+      {/* enter pin popup */}
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="mx-4">
+          <DialogHeader>
+            <DialogTitle className='text-center'>Enter Pin to acess details!</DialogTitle>
+            <DialogDescription>
+              <div>
+                <InputOTP
+                  value={pin}
+                  onChange={setPin}
+                  maxLength={4}
+                  pattern={REGEXP_ONLY_DIGITS}
+                  type='password'
+                >
+                  <InputOTPGroup className='flex gap-3 justify-center w-full my-6 mt-8'>
+                    <InputOTPSlot index={0} className='text-lg h-12 w-12 rounded border border-purple-900 ' />
+                    <InputOTPSlot index={1} className='text-lg h-12 w-12 rounded border border-purple-900 ' />
+                    <InputOTPSlot index={2} className='text-lg h-12 w-12 rounded border border-purple-900 ' />
+                    <InputOTPSlot index={3} className='text-lg h-12 w-12 rounded border border-purple-900 ' />
+                  </InputOTPGroup>
+                </InputOTP>
+                {isDetailsLoading && <div className='text-center w-full'><ClipLoader  size={"16px"} color='gray'/></div>}
+                {error && !isDetailsLoading && <p className='text-center text-sm text-red-700'>{error}</p>}
+                <p className='text-xs md:text-sm text-center'>Forget pin! <span className='text-blue-600 hover:underline cursor-pointer'>reset</span></p>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

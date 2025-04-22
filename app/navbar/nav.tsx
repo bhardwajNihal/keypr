@@ -18,12 +18,12 @@ export default function Navbar() {
 
     const {setTheme} = useTheme()
 
-    return <nav className="flex justify-between items-center h-16 center px-8 md:px-24 container mx-auto border-b border-muted">
+    return <nav className="flex justify-between items-center h-16 center px-6 md:px-8 lg:px-16 container mx-auto border-b border-muted">
         <div className="logo font-bold text-xl w-16 relative flex items-center"><span>Keyp</span><MdVpnKey className="rotate-270 font-bold absolute top-2 right-0" /></div>
         
-        <div className="text-purple-600"><MenuIcon className="md:hidden"/></div>
+        <div className="text-purple-100"><MenuIcon className="sm:hidden"/></div>
 
-        <div className="options className md:flex gap-8 items-center text-sm hidden md:block">
+        <div className="options className sm:flex gap-8 items-center text-sm hidden sm:block">
 
             <SignedOut>
                 <ul className="flex items-center gap-4">

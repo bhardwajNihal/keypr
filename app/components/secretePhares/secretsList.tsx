@@ -3,17 +3,25 @@ import React, { useEffect, useState } from 'react'
 import { GoTrash } from 'react-icons/go'
 import { RiLock2Fill } from 'react-icons/ri'
 import { ClipLoader } from 'react-spinners';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '../ui/input-otp';
+import { REGEXP_ONLY_DIGITS } from 'input-otp';
 
-interface phrasePreviewType{
+interface phrasePreviewType {
   _id: string;
-  walletName : string;
-  phrase : string;
+  walletName: string;
+  phrase: string;
 }
 
 const AddedSecrets = () => {
 
+  const [pin, setPin] = useState("");
+  const [phraseId, setPhraseId] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
   const [phrases, setPhrases] = useState<phrasePreviewType[]>([])
   const [loading, setLoading] = useState(false)
+  const [isDetailsLoading, setIsDetailsLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     async function fetchPhrases() {
@@ -31,8 +39,37 @@ const AddedSecrets = () => {
     fetchPhrases();
   }, [])
 
+  useEffect(() => {
+    if(pin.length===4 && phraseId!==null){
+      async function fetchDetails() {
+        try {
+          setIsDetailsLoading(true);
+          const res = await axios.post(`/api/users/details/secret-phrase/${phraseId}`,{pin},{validateStatus:()=>true})
+          console.log(res);
+          if (res.status !== 200) {
+            setError(res.data.message)
+            setPin("");
+            setIsDetailsLoading(false);
+            return;
+          };
+          setPin("");
+          setPhraseId("");
+          setIsOpen(false);
+          setIsDetailsLoading(false);
+        } catch (error) {
+          console.error("Error fetching password details", error);
+          setPin("");
+          setPhraseId("");
+          setIsOpen(false);
+          setIsDetailsLoading(false);
+        }
+      }
+      fetchDetails();
+    }
+  },[pin,phraseId])
+
   return (
-    <div className='shadow-sm shadow-purple-900 h-full w-full md:w-3/5 rounded px-2 sm:px-4 pb-4 flex flex-col gap-3 overflow-hidden overflow-y-auto relative'>
+    <div className='shadow-sm shadow-purple-900 h-screen w-full md:w-3/5 rounded px-2 sm:px-4 pb-4 flex flex-col gap-3 overflow-hidden overflow-y-auto relative'>
 
       <h2 className="font-semibold text-lg sticky top-0 py-3 bg-background/30 z-50 backdrop-blur-xl">Added Secret Phrases</h2>
 
@@ -40,6 +77,10 @@ const AddedSecrets = () => {
       {phrases && phrases.length > 0 && !loading
         ? phrases.map((phrase) =>
           <div
+            onClick={() => {
+              setIsOpen(true)
+              setPhraseId(phrase._id)
+            }}
             key={phrase._id}
             className="relative shadow-sm shadow-purple-900 hover:shadow-lg w-full rounded-2xl p-4 bg-card border border-border shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer"
           >
@@ -64,6 +105,34 @@ const AddedSecrets = () => {
           </div>)
         : !loading && <div className="text-center mt-8 text-muted-foreground/60">No Credentials added yet!</div>
       }
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className='text-center'>Enter Pin to acess details!</DialogTitle>
+            <DialogDescription>
+              <div>
+                <InputOTP
+                  value={pin}
+                  onChange={setPin}
+                  maxLength={4}
+                  pattern={REGEXP_ONLY_DIGITS}
+                  type='password'
+                >
+                  <InputOTPGroup className='flex gap-3 justify-center w-full my-4'>
+                    <InputOTPSlot index={0} className='text-lg h-12 w-12 rounded border border-purple-900 ' />
+                    <InputOTPSlot index={1} className='text-lg h-12 w-12 rounded border border-purple-900 ' />
+                    <InputOTPSlot index={2} className='text-lg h-12 w-12 rounded border border-purple-900 ' />
+                    <InputOTPSlot index={3} className='text-lg h-12 w-12 rounded border border-purple-900 ' />
+                  </InputOTPGroup>
+                </InputOTP>
+                {isDetailsLoading && <div className='text-center w-full'><ClipLoader  size={"16px"} color='gray'/></div>}
+                {error && !isDetailsLoading && <p className='text-center text-sm text-red-700'>{error}</p>}
+                <p className='text-xs md:text-sm text-center'>Forget pin! <span className='text-blue-600 hover:underline cursor-pointer'>reset</span></p>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

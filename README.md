@@ -61,10 +61,11 @@ Todos :
      >> UI for added creds list✅
      |
      |  v. /details - for detailed info for the added item, only to be shown once pin is validated
-     |      - /card/:id  
-     |      - /password/:id
-     |      - /secret-phrase/:id
+     |      - /card/:id  ✅
+     |      - /password/:id✅
+     |      - /secret-phrase/:id✅
 
+        #finally displaying full unmasked details to the frontend
         ** forgot pin  
 
         ** Ui tweekings

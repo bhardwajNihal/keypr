@@ -1,6 +1,6 @@
 'use client'
 import axios from "axios";
-import React, { useRef, useState } from "react"
+import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
@@ -17,8 +17,8 @@ interface FormValues {
 
 const AddCardForm = () => {
 
-  const yearRef = useRef<HTMLInputElement>(null);
-  const cvvRef = useRef<HTMLInputElement>(null)
+  // const yearRef = useRef<HTMLInputElement>(null);
+  // const cvvRef = useRef<HTMLInputElement>(null)
 
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +26,8 @@ const AddCardForm = () => {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
+    setFocus
   } = useForm<FormValues>()
 
   const onSubmit = async(data: FormValues) => {
@@ -38,6 +39,7 @@ const AddCardForm = () => {
       expiry: `${data.expiryMonth}${data.expiryYear}`,
       cvv: data.cvv,
     };
+    
     // console.log("Form Submitted:", payload);
     // finally making API call
     try {
@@ -54,7 +56,7 @@ const AddCardForm = () => {
   }
 
   return (
-    <div className='shadow shadow-purple-900 h-fit w-full md:w-2/5 rounded p-2 sm:p-4'>
+    <div className='shadow shadow-purple-900 h-fit w-full md:w-2/5 rounded p-2 sm:p-4 mb-4'>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
@@ -106,11 +108,11 @@ const AddCardForm = () => {
               },
             })}
             inputMode="numeric"
-            type="number"
+            type="text"
             placeholder="MM"
             className="border bg-background p-2 rounded w-16 placeholder:text-sm"
-            onInput={(e:React.ChangeEvent<HTMLInputElement>) => {
-              if(e.target.value.length ===2) yearRef.current?.focus()
+            onChange={(e:React.ChangeEvent<HTMLInputElement>) => {
+              if(e.target.value.length ===2) setFocus('expiryYear')
             }}
           />
           <span className="text-muted-foreground">/</span>
@@ -122,13 +124,12 @@ const AddCardForm = () => {
                 "Year must be this year or later",
             })}
             inputMode="numeric"
-            type="number"
+            type="text"
             placeholder="YY"
             className="border bg-background p-2 rounded w-16 placeholder:text-sm"
-            onInput={(e:React.ChangeEvent<HTMLInputElement>) => {
-              if(e.target.value.length===2) cvvRef.current?.focus();
+            onChange={(e:React.ChangeEvent<HTMLInputElement>) => {
+              if(e.target.value.length===2) setFocus('cvv')
             }}
-            ref={yearRef}
           />
         </div>
         {(errors.expiryYear || errors.expiryMonth) && <p className="text-red-800 text-xs sm:text-sm">{errors.expiryYear?.message || errors.expiryMonth?.message}</p>}
@@ -143,10 +144,10 @@ const AddCardForm = () => {
                 message: "CVV must be 3 or 4 digits",
               },
             })}
-            type="number"
+            inputMode="numeric"
+            type="text"
             placeholder="123"
             className="border bg-background p-2 w-full rounded placeholder:text-sm"
-            ref={cvvRef}
           />
           {errors.cvv && <p className="text-red-800 text-xs sm:text-sm">{errors.cvv.message}</p>}
         </div>

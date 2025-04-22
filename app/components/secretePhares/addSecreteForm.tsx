@@ -40,28 +40,34 @@ const AddSecretForm = () => {
   }
 
   return (
-    <div className='shadow shadow-purple-900 h-fit w-full md:w-2/5 rounded p-2 sm:p-4'>
+    <div className='shadow shadow-purple-900 h-fit w-full md:w-2/5 rounded p-2 sm:p-4 mb-4'>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
         <div>
+          <p>wallet name</p>
           <input
             {...register("walletName", { required: "WalletName is required", minLength: 3 })}
             placeholder="bitcoin wallet"
             className="border p-2 w-full rounded"
           />
-          {errors.walletName && <p className="text-red-500">{errors.walletName.message}</p>}
+          {errors.walletName && <p className="text-red-800 text:xs sm:text-sm">{errors.walletName.message}</p>}
         </div>
 
         <div>
+          <p>secret phrase</p>
           <textarea
             {...register("phrase", {
               required: "Secret phrase is required!",
+              validate: (value) => {
+                const wordCount = value.trim().split(/\s+/).length;
+                return wordCount === 12 || wordCount === 24 || "Phrase must be exactly 12 or 24 words";
+              }        
             })}
             placeholder="adapt bridge cat .... .... ...."
             className="border p-2 w-full rounded"
           />
-          {errors.phrase && <p className="text-red-500">{errors.phrase.message}</p>}
+          {errors.phrase && <p className="text-red-800 text:xs sm:text-sm">{errors.phrase.message}</p>}
         </div>
 
         <button
