@@ -65,22 +65,22 @@ Todos :
      |      - /password/:id✅
      |      - /secret-phrase/:id✅
 
+        # testing routes ✅
+
         #finally displaying full unmasked details to the frontend
         ** forgot pin  
 
         ** Ui tweekings
-
-        # testing routes ✅
 
 // frontend
         i. react hook form form validation for : 
             - card✅
             - password✅
             - phrase✅
-        ii. displaying partial details in the details section
-        iii. when clicked, displaying popup for entering pin
+        ii. displaying partial details in the details section✅
+        iii. when clicked, displaying popup for entering pin✅
         iv. once pin is validated, showing full card details.
-        v. adding copy,delete,update options.
+        v. adding copy,delete options.
 
     # Finally 
         -Reset pin functionality, 

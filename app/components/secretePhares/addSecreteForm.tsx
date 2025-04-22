@@ -74,7 +74,7 @@ const AddSecretForm = () => {
           type="submit"
           className="w-full text-white px-4 py-2 rounded bg-purple-800 hover:bg-purple-700"
         >
-          {(loading) ? <ClipLoader size={"12px"} color="white"/> : "Add"}
+          {(loading) ? <ClipLoader size={"12px"} color="white"/> : "Add Secret"}
         </button>
       </form>
 

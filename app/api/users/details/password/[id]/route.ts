@@ -42,13 +42,13 @@ export async function POST(req: NextRequest, { params }: paramsType) {
     // if pin validated return decrypted response
     const res = await Password.findOne({ _id: id });
 
-    const Passworddetails = {
+    const PasswordDetails = {
       site: res.site,
       username: decrypt(res.username),
       password: decrypt(res.password),
     };
     
-    return NextResponse.json({ Passworddetails }, { status: 200 });
+    return NextResponse.json({ PasswordDetails }, { status: 200 });
 
   } catch (error) {
     return NextResponse.json(

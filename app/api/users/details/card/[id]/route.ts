@@ -42,7 +42,7 @@ export async function POST(req: NextRequest, { params }: paramsType) {
     // if pin validated return decrypted response
     const res = await Card.findOne({ _id: id });
 
-    const Carddetails = {
+    const CardDetails = {
       title: res.title,
       CardHolderName: res.CardHolderName,
       cardNumber: decrypt(res.cardNumber),
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest, { params }: paramsType) {
       cvv: decrypt(res.cvv),
     };
 
-    return NextResponse.json({ Carddetails }, { status: 200 });
+    return NextResponse.json({ CardDetails }, { status: 200 });
 
   } catch (error) {
     return NextResponse.json(

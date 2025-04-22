@@ -5,7 +5,11 @@ import { Card } from "@/app/models/card.model";
 
 ConnectToDB();
 
-export async function DELETE(req:NextRequest) {
+interface paramsType{
+  params : {cardId : string}
+}
+
+export async function DELETE(req:NextRequest, {params}:paramsType) {
   try {
     // check if session valid
     const { userId } = await auth();
@@ -16,12 +20,13 @@ export async function DELETE(req:NextRequest) {
       );
     }
   
-    const {cardId} = await req.json();
+    const {cardId} = await params;
   
     // once authorized delete entry from db
     await Card.findOneAndDelete({userId, _id:cardId});
   
     return NextResponse.json({message : "Card deleted Successfully!"},{status:200});
+    
   } catch (error) {
     return NextResponse.json({message : "Error deleting Card!", error},{status:500});
   }

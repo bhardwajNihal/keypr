@@ -5,7 +5,12 @@ import { SecretPhrase } from "@/app/models/secretPhrase.model";
 
 ConnectToDB();
 
-export async function DELETE(req:NextRequest) {
+
+interface paramsType{
+  params : {phraseId : string};
+}
+
+export async function DELETE(req:NextRequest, {params}:paramsType) {
   try {
     // check if session valid
     const { userId } = await auth();
@@ -16,10 +21,10 @@ export async function DELETE(req:NextRequest) {
       );
     }
   
-    const {secretPhraseId} = await req.json();
+    const {phraseId} = await params;
   
     // once authorized delete entry from db
-    await SecretPhrase.findOneAndDelete({userId, _id:secretPhraseId});
+    await SecretPhrase.findOneAndDelete({userId,_id:phraseId});
   
     return NextResponse.json({message : "Secret phrase deleted Successfully!"},{status:200});
     

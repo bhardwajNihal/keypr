@@ -3,13 +3,24 @@ import React, { useEffect, useState } from 'react'
 import { GoTrash } from 'react-icons/go'
 import { RiLock2Fill } from 'react-icons/ri'
 import { ClipLoader } from 'react-spinners';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '../ui/input-otp';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
+import { CopyIcon } from 'lucide-react';
+import { FaArrowLeft } from "react-icons/fa";
+import toast from 'react-hot-toast';
+
 
 interface cardPreviewType {
   _id: string;
   title: string;
+  cardNumber: string;
+  expiry: string;
+  cvv: string
+}
+interface cardDetailsType {
+  title: string;
+  CardHolderName: string;
   cardNumber: string;
   expiry: string;
   cvv: string
@@ -23,6 +34,8 @@ const AddedCards = () => {
   const [loading, setLoading] = useState(false);
   const [isDetailsLoading, setIsDetailsLoading] = useState(false)
   const [error, setError] = useState("");
+  const [cardDetails, setCardDetails] = useState<cardDetailsType>()
+  const [deletingCardId, setDeletingCardId] = useState<string | null>(null);
 
   useEffect(() => {
 
@@ -49,13 +62,14 @@ const AddedCards = () => {
             { pin },
             { validateStatus: () => true }    // desables auto throwing error, so that we can handle it in our way
           )
-          console.log(res);
           if (res.status !== 200) {
             setError(res.data.message)
             setPin("");
             setIsDetailsLoading(false);
             return;
           };
+          // console.log(res);
+          setCardDetails(res.data.CardDetails)
           setPin("");
           setCardId("");
           setIsOpen(false);
@@ -72,9 +86,22 @@ const AddedCards = () => {
     }
   }, [pin, cardId])
 
+  async function handleDelete(cardId: string) {
+      try {
+        setDeletingCardId(cardId);
+        const res = await axios.delete(`api/users/delete/card/${cardId}`,)
+        toast.success(res.data.message);
+        setDeletingCardId(null);
+      } catch (error) {
+        console.error("Error deleting Card!", error);
+        toast.error("Error deleting card!");
+        setDeletingCardId(null);
+      }
+  }
+
   // useEffect(() => {
-  //   console.log(cards);
-  // }, [cards])
+  //   console.log(cardDetails);
+  // }, [cardDetails])
 
   return (
     <div className='shadow shadow-purple-900 h-screen w-full md:w-3/5 rounded flex flex-col gap-3 px-2 sm:px-4 pb-6 overflow-hidden overflow-y-auto '>
@@ -98,8 +125,13 @@ const AddedCards = () => {
             </div>
 
             {/* Delete Icon */}
-            <button className="absolute top-3 right-3 text-muted-foreground hover:text-destructive transition">
-              <GoTrash size={18} />
+            <button
+            onClick={(e) => {
+              e.stopPropagation(); 
+              handleDelete(card._id)
+            }}
+            className="absolute top-3 right-3 text-muted-foreground hover:text-destructive transition">
+              {deletingCardId===card._id ? <ClipLoader size={15} color='gray'/> : <GoTrash size={18} />}
             </button>
 
             {/* Content */}
@@ -125,8 +157,8 @@ const AddedCards = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className='text-center'>Enter Pin to acess details!</DialogTitle>
-            <DialogDescription>
-              <div>
+            <div>
+              {<div>
                 <InputOTP
                   value={pin}
                   onChange={setPin}
@@ -145,10 +177,81 @@ const AddedCards = () => {
                 {error && !isDetailsLoading && <p className='text-center text-sm text-red-700'>{error}</p>}
                 <p className='text-xs md:text-sm text-center'>Forget pin! <span className='text-blue-600 hover:underline cursor-pointer'>reset</span></p>
               </div>
-            </DialogDescription>
+              }
+            </div>
           </DialogHeader>
         </DialogContent>
       </Dialog>
+
+      {cardDetails && <div className='min-h-screen w-full flex items-center justify-center absolute top-0 left-0 z-50'>
+
+        <div className="w-full max-w-md mx-auto mt-6 p-6 rounded-2xl shadow-xl shadow-purple-900 bg-background/70 backdrop-blur-lg shadow-lg text-foreground space-y-3 relative">
+
+          <span className='absolute top-8 left-12 text-muted-foreground hover:text-purple-500 hover:-translate-x-1 duration-300 cursor-pointer' onClick={() => setCardDetails(undefined)}><FaArrowLeft/></span>
+          <h3 className="text-xl font-bold text-center text-purple-600 dark:text-purple-400">
+            💳Card Details
+          </h3>
+
+          <div className="flex justify-between border-b border-border pb-3">
+            <div className="font-mono text-center w-full text-lg font-semibold">{cardDetails.title}</div>
+          </div>
+
+          <div className="flex justify-between border-b border-border pb-2 relative">
+            <span className="font-medium text-muted-foreground">Cardholder Name</span>
+            <span className="font-mono mr-8">{cardDetails.CardHolderName}</span>
+            <span className='text-muted-foreground/50 absolute right-0'>
+              <CopyIcon
+                onClick={() => {
+                  navigator.clipboard.writeText(cardDetails.CardHolderName)
+                  toast.success("Copied to clipboard!", {position:"bottom-center"})
+                }}
+                className='hover:text-purple-400' size={"15px"} />
+            </span>
+          </div>
+
+          <div className="flex justify-between border-b border-border pb-2 relative">
+            <span className="font-medium text-muted-foreground">Card Number</span>
+            <span className="font-mono mr-8">{cardDetails.cardNumber}</span>
+            <span className='text-muted-foreground/50 hover:bg-purple-900/10 absolute right-0'>
+              <CopyIcon
+                onClick={() => {
+                  navigator.clipboard.writeText(cardDetails.cardNumber)
+                  toast.success("Copied to clipboard!", {position:"bottom-center"})
+                }}
+                className='hover:text-purple-400' size={"15px"} />
+            </span>
+          </div>
+
+          <div className="flex justify-between border-b border-border pb-2 relative">
+            <span className="font-medium text-muted-foreground">Expiry</span>
+            <span className="font-mono mr-8">{cardDetails.expiry.slice(0, 2)}/{cardDetails.expiry.slice(2, 4)}</span>
+            <span className='text-muted-foreground/50 hover:bg-purple-900/10 absolute right-0'>
+              <CopyIcon
+                onClick={() => {
+                  navigator.clipboard.writeText(`${cardDetails.expiry.slice(0, 2)}/${cardDetails.expiry.slice(2, 4)}`)
+                  toast.success("Copied to clipboard!", {position:"bottom-center"})
+                }}
+                className='hover:text-purple-400' size={"15px"} />
+            </span>
+          </div>
+
+          <div className="flex justify-between relative">
+            <span className="font-medium text-muted-foreground">CVV</span>
+            <span className="font-mono mr-8">{cardDetails.cvv}</span>
+            <span className='text-muted-foreground/50 hover:bg-purple-900/10 absolute right-0'>
+              <CopyIcon
+                onClick={() => {
+                  navigator.clipboard.writeText(cardDetails.cvv)
+                  toast.success("Copied to clipboard!", {position:"bottom-center"})
+                }}
+                className='hover:text-purple-400' size={"15px"} />
+            </span>
+          </div>
+
+        </div>
+
+      </div>}
+
     </div >
   )
 }

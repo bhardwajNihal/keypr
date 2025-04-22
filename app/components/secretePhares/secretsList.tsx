@@ -3,12 +3,21 @@ import React, { useEffect, useState } from 'react'
 import { GoTrash } from 'react-icons/go'
 import { RiLock2Fill } from 'react-icons/ri'
 import { ClipLoader } from 'react-spinners';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '../ui/input-otp';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
+import { CopyIcon } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { FaArrowLeft } from 'react-icons/fa';
+
 
 interface phrasePreviewType {
   _id: string;
+  walletName: string;
+  phrase: string;
+}
+
+interface phraseDetailType {
   walletName: string;
   phrase: string;
 }
@@ -22,6 +31,8 @@ const AddedSecrets = () => {
   const [loading, setLoading] = useState(false)
   const [isDetailsLoading, setIsDetailsLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [phraseDetails, setPhraseDetails] = useState<phraseDetailType>();
+  const [deletingPhraseId, setDeletingPhraseId] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchPhrases() {
@@ -32,7 +43,7 @@ const AddedSecrets = () => {
         // console.log(res);
         setLoading(false);
       } catch (error) {
-        console.error("error fetching secret pharese!, ERROR : ", error);
+        console.error("error fetching secret phrase!, ERROR : ", error);
         setLoading(false);
       }
     }
@@ -40,18 +51,18 @@ const AddedSecrets = () => {
   }, [])
 
   useEffect(() => {
-    if(pin.length===4 && phraseId!==null){
+    if (pin.length === 4 && phraseId !== null) {
       async function fetchDetails() {
         try {
           setIsDetailsLoading(true);
-          const res = await axios.post(`/api/users/details/secret-phrase/${phraseId}`,{pin},{validateStatus:()=>true})
-          console.log(res);
+          const res = await axios.post(`/api/users/details/secret-phrase/${phraseId}`, { pin }, { validateStatus: () => true })
           if (res.status !== 200) {
             setError(res.data.message)
             setPin("");
             setIsDetailsLoading(false);
             return;
           };
+          setPhraseDetails(res.data.phraseDetails)
           setPin("");
           setPhraseId("");
           setIsOpen(false);
@@ -66,10 +77,24 @@ const AddedSecrets = () => {
       }
       fetchDetails();
     }
-  },[pin,phraseId])
+  }, [pin, phraseId])
+
+
+  async function handleDelete(phraseId : string) {
+    
+    try {
+      setDeletingPhraseId(phraseId);
+      const res = await axios.delete(`api/users/delete/secret-phrase/${phraseId}`);
+      toast.success(res.data.message);
+      setDeletingPhraseId(null);
+    } catch (error) {
+      console.error("Error deleting phrase!",error);
+      toast.error("Error deleting phrase!")
+    }
+  }
 
   return (
-    <div className='shadow-sm shadow-purple-900 h-screen w-full md:w-3/5 rounded px-2 sm:px-4 pb-4 flex flex-col gap-3 overflow-hidden overflow-y-auto relative'>
+    <div className='shadow-sm shadow-purple-900 h-screen w-full md:w-3/5 rounded px-2 sm:px-4 pb-4 flex flex-col gap-3 overflow-hidden overflow-y-auto'>
 
       <h2 className="font-semibold text-lg sticky top-0 py-3 bg-background/30 z-50 backdrop-blur-xl">Added Secret Phrases</h2>
 
@@ -90,8 +115,13 @@ const AddedSecrets = () => {
             </div>
 
             {/* Delete Icon */}
-            <button className="absolute top-3 right-3 text-muted-foreground hover:text-destructive transition">
-              <GoTrash size={18} />
+            <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete(phrase._id);
+            }}
+            className="absolute top-3 right-3 text-muted-foreground hover:text-destructive transition">
+              {deletingPhraseId===phrase._id ? <ClipLoader size={16} color='gray'/> : <GoTrash size={18} />}
             </button>
 
             {/* Content */}
@@ -109,7 +139,7 @@ const AddedSecrets = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className='text-center'>Enter Pin to acess details!</DialogTitle>
-            <DialogDescription>
+            <div>
               <div>
                 <InputOTP
                   value={pin}
@@ -125,14 +155,45 @@ const AddedSecrets = () => {
                     <InputOTPSlot index={3} className='text-lg h-12 w-12 rounded border border-purple-900 ' />
                   </InputOTPGroup>
                 </InputOTP>
-                {isDetailsLoading && <div className='text-center w-full'><ClipLoader  size={"16px"} color='gray'/></div>}
+                {isDetailsLoading && <div className='text-center w-full'><ClipLoader size={"16px"} color='gray' /></div>}
                 {error && !isDetailsLoading && <p className='text-center text-sm text-red-700'>{error}</p>}
                 <p className='text-xs md:text-sm text-center'>Forget pin! <span className='text-blue-600 hover:underline cursor-pointer'>reset</span></p>
               </div>
-            </DialogDescription>
+            </div>
           </DialogHeader>
         </DialogContent>
       </Dialog>
+
+      {phraseDetails && <div className='min-h-screen w-full flex items-center justify-center absolute top-0 left-0 z-50'>
+
+        <div className="w-full max-w-md mx-auto mt-6 p-6 rounded-2xl shadow-xl shadow-purple-900 bg-background/70 backdrop-blur-lg shadow-lg text-foreground space-y-3 relative">
+
+          <span className='absolute top-6 left-10 text-muted-foreground hover:text-purple-500 hover:-translate-x-1 duration-300 cursor-pointer' onClick={() => setPhraseDetails(undefined)}><FaArrowLeft /></span>
+          <h3 className="text-xl font-bold text-center text-purple-600 dark:text-purple-400">
+            🔓Secret Phrase Unmasked
+          </h3>
+
+          <div className="flex justify-between border-b border-border pt-4 pb-2 relative">
+            <span className="font-medium text-muted-foreground">Wallet Name</span>
+            <span className="font-mono mr-8">{phraseDetails.walletName}</span>
+          </div>
+
+          <div className="flex justify-between gap-12 h-fit border-b border-border py-4 relative">
+            <span className="font-medium text-muted-foreground">Phrase</span>
+            <span className="font-mono mr-8">{phraseDetails.phrase}</span>
+            <span className='text-muted-foreground/50 hover:bg-purple-900/10 absolute right-0'>
+              <CopyIcon
+                onClick={() => {
+                  navigator.clipboard.writeText(phraseDetails.phrase)
+                  toast.success("Copied to clipboard!", { position: "bottom-center" })
+                }}
+                className='hover:text-purple-400' size={"15px"} />
+            </span>
+          </div>
+        </div>
+
+      </div>}
+
     </div>
   )
 }
