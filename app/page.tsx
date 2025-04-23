@@ -1,6 +1,7 @@
-// app/page.tsx
+
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import LandingPage from "./components/landingPage";
 
 export default async function Home() {
   const { userId } = await auth();
@@ -9,11 +10,7 @@ export default async function Home() {
     redirect("/dashboard");
   }
 
-  return (
-    <main>
-      {/* Your landing page content here */}
-      <h1>Welcome to Keypr 🔐</h1>
-      <p>Your all-in-one secure password vault</p>
-    </main>
-  );
+  return <LandingPage/>
+
 }
+    

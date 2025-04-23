@@ -20,7 +20,7 @@ export async function DELETE(req:NextRequest, {params}: paramsType) {
       );
     }
   
-    const {passwordId} = await params;
+    const {passwordId} = params;
   
     // once authorized delete entry from db
     await Password.findOneAndDelete({userId, _id:passwordId});

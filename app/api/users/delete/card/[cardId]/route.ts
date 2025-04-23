@@ -20,7 +20,7 @@ export async function DELETE(req:NextRequest, {params}:paramsType) {
       );
     }
   
-    const {cardId} = await params;
+    const {cardId} = params;
   
     // once authorized delete entry from db
     await Card.findOneAndDelete({userId, _id:cardId});

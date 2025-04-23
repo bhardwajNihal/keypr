@@ -1,7 +1,9 @@
 
 const Footer = () => {
   return (
-    <div className="border-t border-muted w-full h-12 px-6 md:px-8 lg:px-16 container mx-auto">footer</div>
+    <footer className="mt-16 mb-8 text-center text-sm text-muted-foreground border-t pt-6 border-border">
+        © 2025 Keypr. All rights reserved.
+      </footer>
   )
 }
 

@@ -21,7 +21,7 @@ export async function DELETE(req:NextRequest, {params}:paramsType) {
       );
     }
   
-    const {phraseId} = await params;
+    const {phraseId} = params;
   
     // once authorized delete entry from db
     await SecretPhrase.findOneAndDelete({userId,_id:phraseId});

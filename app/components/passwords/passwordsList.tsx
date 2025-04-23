@@ -188,7 +188,7 @@ const AddedPasswords = () => {
           </div>
 
           <div className="flex justify-between border-b border-border pb-2 relative">
-            <span className="font-medium text-muted-foreground">Card Number</span>
+            <span className="font-medium text-muted-foreground">username</span>
             <span className="font-mono mr-8">{passwordDetails.username}</span>
             <span className='text-muted-foreground/50 hover:bg-purple-900/10 absolute right-0'>
               <CopyIcon
