@@ -21,7 +21,6 @@ export interface ContainerTextFlipProps {
 export function ContainerTextFlip({
   words = ["better", "modern", "beautiful", "awesome"],
   interval = 3000,
-  className,
   textClassName,
   animationDuration = 700,
 }: ContainerTextFlipProps) {
@@ -62,11 +61,9 @@ export function ContainerTextFlip({
       transition={{ duration: animationDuration / 2000 }}
       className={cn(
         "relative inline-block rounded-lg pt-2 mx-2 pb-3 text-center text-lg font-semibold text-black md:text-xl dark:text-white",
-        "[background:linear-gradient(to_bottom,#4D168C,#e5e7eb)]",
         "shadow-[inset_0_-1px_#d1d5db,inset_0_0_0_1px_#d1d5db,_0_4px_8px_#d1d5db]",
-        "dark:[background:linear-gradient(to_bottom,#374151,#1f2937)]",
         "dark:shadow-[inset_0_-1px_#10171e,inset_0_0_0_1px_hsla(205,89%,46%,.24),_0_4px_8px_#00000052]",
-        className,
+        "backdrop-blur-xl",
       )}
       key={words[currentWordIndex]}
     >

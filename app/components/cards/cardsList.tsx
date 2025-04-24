@@ -9,9 +9,11 @@ import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { CopyIcon } from 'lucide-react';
 import { FaArrowLeft } from "react-icons/fa";
 import toast from 'react-hot-toast';
+import { useRecoilState } from 'recoil';
+import { cardAtom } from '@/app/recoil/cardAtom';
 
 
-interface cardPreviewType {
+export interface cardPreviewType {
   _id: string;
   title: string;
   cardNumber: string;
@@ -30,7 +32,7 @@ const AddedCards = () => {
   const [pin, setPin] = useState("");
   const [cardId, setCardId] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [cards, setCards] = useState<cardPreviewType[]>([])
+  const [cards, setCards] = useRecoilState<cardPreviewType[]>(cardAtom);
   const [loading, setLoading] = useState(false);
   const [isDetailsLoading, setIsDetailsLoading] = useState(false)
   const [error, setError] = useState("");
@@ -51,7 +53,7 @@ const AddedCards = () => {
       }
     }
     fetchCards()
-  }, []);
+  }, [setCards]);
 
   useEffect(() => {
     if (pin.length === 4 && cardId !== null) {

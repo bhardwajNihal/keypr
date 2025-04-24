@@ -5,11 +5,9 @@ import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 
-interface paramsType {
-  params: { id: string };
-}
 
-export async function POST(req: NextRequest, { params }: paramsType) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function POST(req: NextRequest, { params }: any) {
   try {
     const { id } = await params;
     

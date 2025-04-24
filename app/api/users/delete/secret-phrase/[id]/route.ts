@@ -1,15 +1,12 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { ConnectToDB } from "@/app/Db/dbConnection";
-import { Card } from "@/app/models/card.model";
+import { SecretPhrase } from "@/app/models/secretPhrase.model";
 
 ConnectToDB();
 
-interface paramsType{
-  params : {cardId : string}
-}
-
-export async function DELETE(req:NextRequest, {params}:paramsType) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function DELETE(req:NextRequest, { params }: any) {
   try {
     // check if session valid
     const { userId } = await auth();
@@ -20,15 +17,15 @@ export async function DELETE(req:NextRequest, {params}:paramsType) {
       );
     }
   
-    const {cardId} = params;
+    const {id} = params;
   
     // once authorized delete entry from db
-    await Card.findOneAndDelete({userId, _id:cardId});
+    await SecretPhrase.findOneAndDelete({userId,_id:id});
   
-    return NextResponse.json({message : "Card deleted Successfully!"},{status:200});
+    return NextResponse.json({message : "Secret phrase deleted Successfully!"},{status:200});
     
   } catch (error) {
-    return NextResponse.json({message : "Error deleting Card!", error},{status:500});
+    return NextResponse.json({message : "Error deleting Secret phrase!", error},{status:500});
   }
 
 }

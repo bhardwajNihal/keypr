@@ -19,7 +19,7 @@ export default function Navbar() {
 
     const { setTheme } = useTheme()
 
-    return <nav className="flex justify-between items-center border-b h-16 w-full px-8 md:px-16 lg:px-40  fixed top-0 z-50 bg-background/20 backdrop-blur-3xl">
+    return <nav className="flex justify-between items-center border-b h-16 w-full px-8 md:px-16 lg:px-40  fixed top-0 z-50 bg-background/20 backdrop-blur-sm">
 
         {/* logo */}
         <div className="flex flex-col items-start">
@@ -27,7 +27,7 @@ export default function Navbar() {
                 <span>Keyp</span>
                 <MdVpnKey className="rotate-270 font-bold absolute top-2 right-0" />
             </div>
-            <span className="text-xs sm:text-sm -mt-1 text-muted-foreground font-light">
+            <span className="text-xs sm:text-sm -mt-1 text-gray-600  dark:text-muted-foreground">
                 A vault you can trust.
             </span>
         </div>
@@ -40,7 +40,7 @@ export default function Navbar() {
                 <ul className="flex items-center gap-4">
                     <Link href={'#home'} scroll={true} ><li className="hover:underline cursor-pointer">Home</li></Link>
                     <Link href={'#features'} scroll={true}><li className="hover:underline cursor-pointer">Features</li></Link>
-                    <Link href={'#about'} scroll={true}><li className="hover:underline cursor-pointer">About</li></Link>
+                    <Link href={'#about'} scroll={true}><li className="hover:underline cursor-pointer">FAQs</li></Link>
                 </ul>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>

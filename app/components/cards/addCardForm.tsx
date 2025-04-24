@@ -45,6 +45,7 @@ const AddCardForm = () => {
     try {
       setLoading(true);
       const res = await axios.post("/api/users/add/card",payload);
+      
       reset()
       toast.success(res.data.message);
       setLoading(false);
