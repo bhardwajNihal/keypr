@@ -41,6 +41,7 @@ const AddedCards = () => {
   const [error, setError] = useState("");
   const [cardDetails, setCardDetails] = useState<cardDetailsType>()
   const [deletingCardId, setDeletingCardId] = useState<string | null>(null);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   useEffect(() => {
 
@@ -110,11 +111,13 @@ const AddedCards = () => {
 
   async function handleSendEmail(){
     try {
+      setIsSendingEmail(true)
       const res = await axios.post("api/users/send-email",{email:user?.primaryEmailAddress?.emailAddress})
-      toast.success(res.data.message);
-      
+      setIsSendingEmail(false);
+      toast.success(res.data.message);      
     } catch (error) {
       console.error("Error sending Email!",error);
+      setIsSendingEmail(false);
       toast.error("Error sending email!");
     }
   }
@@ -195,10 +198,11 @@ const AddedCards = () => {
                 </InputOTP>
                 {isDetailsLoading && <div className='text-center w-full'><ClipLoader size={"16px"} color='gray' /></div>}
                 {error && !isDetailsLoading && <p className='text-center text-sm text-red-700'>{error}</p>}
-                <p className='text-xs md:text-sm text-center'>Forget pin! 
-                  <span 
+                <p className='text-xs  md:text-sm text-center'>Forget pin! 
+                  <button 
+                  disabled={isSendingEmail}
                   onClick={handleSendEmail}
-                  className='text-blue-600 hover:underline cursor-pointer'>reset</span>
+                  className='text-blue-500 hover:underline cursor-pointer ml-2'>{isSendingEmail ? <ClipLoader className='ml-2' size={14} color='gray'/> : ' reset'}</button>
                 </p>
               </div>
               }

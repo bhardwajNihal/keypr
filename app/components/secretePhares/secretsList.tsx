@@ -28,7 +28,7 @@ interface phraseDetailType {
 
 const AddedSecrets = () => {
 
-  const {user} = useUser();
+  const { user } = useUser();
   const [pin, setPin] = useState("");
   const [phraseId, setPhraseId] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -38,6 +38,7 @@ const AddedSecrets = () => {
   const [error, setError] = useState(false);
   const [phraseDetails, setPhraseDetails] = useState<phraseDetailType>();
   const [deletingPhraseId, setDeletingPhraseId] = useState<string | null>(null);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   useEffect(() => {
     async function fetchPhrases() {
@@ -53,7 +54,7 @@ const AddedSecrets = () => {
       }
     }
     fetchPhrases();
-  }, [])
+  }, [setPhrases])
 
   useEffect(() => {
     if (pin.length === 4 && phraseId !== null) {
@@ -85,8 +86,8 @@ const AddedSecrets = () => {
   }, [pin, phraseId])
 
 
-  async function handleDelete(phraseId : string) {
-    
+  async function handleDelete(phraseId: string) {
+
     try {
       setDeletingPhraseId(phraseId);
       const res = await axios.delete(`api/users/delete/secret-phrase/${phraseId}`);
@@ -96,22 +97,25 @@ const AddedSecrets = () => {
       toast.success(res.data.message);
       setDeletingPhraseId(null);
     } catch (error) {
-      console.error("Error deleting phrase!",error);
+      console.error("Error deleting phrase!", error);
       toast.error("Error deleting phrase!")
     }
   }
 
-  
-    async function handleSendEmail(){
-      try {
-        const res = await axios.post("api/users/send-email",{email:user?.primaryEmailAddress?.emailAddress})
-        toast.success(res.data.message);
-        
-      } catch (error) {
-        console.error("Error sending Email!",error);
-        toast.error("Error sending email!");
-      }
+
+  async function handleSendEmail() {
+    try {
+      setIsSendingEmail(true)
+      const res = await axios.post("api/users/send-email", { email: user?.primaryEmailAddress?.emailAddress })
+      setIsSendingEmail(false)
+      toast.success(res.data.message);
+
+    } catch (error) {
+      console.error("Error sending Email!", error);
+      setIsSendingEmail(false);
+      toast.error("Error sending email!");
     }
+  }
 
   return (
     <div className='shadow-sm shadow-purple-900 h-screen w-full md:w-3/5 rounded px-2 sm:px-4 pb-4 flex flex-col gap-3 overflow-hidden overflow-y-auto'>
@@ -135,13 +139,13 @@ const AddedSecrets = () => {
             </div>
 
             {/* Delete Icon */}
-            <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDelete(phrase._id);
-            }}
-            className="absolute top-3 right-3 text-muted-foreground hover:text-destructive transition">
-              {deletingPhraseId===phrase._id ? <ClipLoader size={16} color='gray'/> : <GoTrash size={18} />}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(phrase._id);
+              }}
+              className="absolute top-3 right-3 text-muted-foreground hover:text-destructive transition">
+              {deletingPhraseId === phrase._id ? <ClipLoader size={16} color='gray' /> : <GoTrash size={18} />}
             </button>
 
             {/* Content */}
@@ -177,10 +181,11 @@ const AddedSecrets = () => {
                 </InputOTP>
                 {isDetailsLoading && <div className='text-center w-full'><ClipLoader size={"16px"} color='gray' /></div>}
                 {error && !isDetailsLoading && <p className='text-center text-sm text-red-700'>{error}</p>}
-                <p className='text-xs md:text-sm text-center'>Forget pin! 
-                  <span 
-                  onClick={handleSendEmail}
-                  className='text-blue-600 hover:underline cursor-pointer'>reset</span>
+                <p className='text-xs md:text-sm text-center'>Forget pin!
+                  <button
+                    disabled={isSendingEmail}
+                    onClick={handleSendEmail}
+                    className='text-blue-500 hover:underline cursor-pointer ml-2'>{isSendingEmail ? <ClipLoader  className='ml-2' size={14} color='gray' /> : " reset"}</button>
                 </p>
               </div>
             </div>

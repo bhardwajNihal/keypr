@@ -19,7 +19,7 @@ export default function Navbar() {
 
     const { setTheme } = useTheme()
 
-    return <nav className="flex justify-between items-center border-b h-16 w-full px-8 md:px-16 lg:px-40  fixed top-0 z-50 bg-background/20 backdrop-blur-sm">
+    return <nav className="flex justify-between items-center border-b h-16 w-full px-8 md:px-16 lg:px-28  fixed top-0 z-50 bg-background/20 backdrop-blur-sm">
 
         {/* logo */}
         <div className="flex flex-col items-start">
