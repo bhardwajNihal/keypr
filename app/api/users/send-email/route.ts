@@ -6,19 +6,14 @@ export async function POST(req:NextRequest) {
     
     try {
         const {userId} = await auth();
-        console.log(userId);
         
         if(!userId){
             return NextResponse.json({message : "Request Unauthorized!"},{status:401});
         }
     
         const {email} = await req.json();
-        console.log(email);
-        
     
-        const res = await SendEmail(email);
-        console.log(res);
-        
+        await SendEmail(email);
     
         return NextResponse.json({message : "Email Sent successfully! Reset your Pin."},{status:200});
     } catch (error) {

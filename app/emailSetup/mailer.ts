@@ -9,33 +9,25 @@ ConnectToDB();
 
 // basic setup for sending email using nodemailer
 export async function SendEmail(email: string | undefined) {
-
-    console.log("inside sendemail util : ");
     
   if (!email) throw new Error("Email is required.");
-  console.log("");
-  
 
   try {
     const { userId } = await auth();
-    console.log(userId);
     
     if (!userId) {
       throw new Error("Unauthorized Request")
     }
 
     const hashedToken = await bcrypt.hash(userId.toString(), 10);
-
-    console.log(hashedToken);
     
-    const pin = await Pin.findOneAndUpdate(
+    await Pin.findOneAndUpdate(
       { userId },
       {
         forgetPinToken: hashedToken,
         forgetPinExpiry: Date.now() + 3600000, //1 hr
       }
     );
-    console.log("pin : ",pin);
     
 
     // Will be using Mailtrap
@@ -50,7 +42,6 @@ export async function SendEmail(email: string | undefined) {
         pass: process.env.MAILTRAP_PASSWORD,
       },
     });
-    console.log("transport : ",transport);
     
     const mailOptions = {
       from: '"Maddison Foo Koch 👻" <maddison53@ethereal.email>', // sender address
@@ -73,7 +64,6 @@ export async function SendEmail(email: string | undefined) {
     };
 
     const mailResponse = await transport.sendMail(mailOptions);
-    console.log("mailResponse : ", mailResponse);
     
     return mailResponse;
   } catch (error) {

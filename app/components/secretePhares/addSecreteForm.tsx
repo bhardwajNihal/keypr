@@ -26,7 +26,7 @@ const AddSecretForm = () => {
 
   const onSubmit = async(data: FormValues) => {
     
-    console.log("Form Submitted:", data);
+    // console.log("Form Submitted:", data);
     // finally making API call
     try {
       setLoading(true)

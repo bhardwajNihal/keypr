@@ -136,12 +136,22 @@ export default function LandingPage() {
 
                         </AccordionContent>
                     </AccordionItem>
+
                     <AccordionItem value="item-5" className="rounded-xl py-4 px-4 sm:px-20 text-lg my-3 shadow-sm shadow-purple-900 hover:shadow-lg duration-200">
                         <AccordionTrigger className="text-lg text-purple-500 dark:text-purple-400">How does Keypr keep my data safe?</AccordionTrigger>
                         <AccordionContent className="text-start text-muted-foreground text-lg">
                             Everything you store is AES-encrypted before it reaches our database. Only you can decrypt it with your personal PIN. Even we can’t see your data.
                         </AccordionContent>
                     </AccordionItem>
+
+                    <AccordionItem value="item-5" className="rounded-xl py-4 px-4 sm:px-20 text-lg my-3 shadow-sm shadow-purple-900 hover:shadow-lg duration-200">
+                        <AccordionTrigger className="text-lg text-purple-500 dark:text-purple-400">What If I forget my Pin??</AccordionTrigger>
+                        <AccordionContent className="text-start text-muted-foreground text-lg">
+                            No Worries. Just reset it with just a few clicks.
+                        </AccordionContent>
+                    </AccordionItem>
+
+                    
                 </Accordion>
             </section>
 
