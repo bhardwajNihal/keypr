@@ -8,7 +8,6 @@ import Navbar from './navbar/nav'
 import { ThemeProvider } from './components/theme-provider'
 import Footer from './footer/footer'
 import {Toaster} from "react-hot-toast"
-import { RecoilRoot } from "recoil";
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -34,7 +33,6 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <RecoilRoot>
         <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -46,7 +44,6 @@ export default function RootLayout({
           {children}
           <Footer/>
           </ThemeProvider>
-          </RecoilRoot>
         </body>
       </html>
     </ClerkProvider>

@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(
-      { message: "Card details added successfully!" },
+      { message: "Card details added successfully!"},
       { status: 200 }
     );
   } catch (error) {

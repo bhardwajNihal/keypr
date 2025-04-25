@@ -1,3 +1,4 @@
+'use client'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { GoTrash } from 'react-icons/go'
@@ -9,8 +10,9 @@ import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { CopyIcon } from 'lucide-react';
 import { FaArrowLeft } from "react-icons/fa";
 import toast from 'react-hot-toast';
-import { useRecoilState } from 'recoil';
-import { cardAtom } from '@/app/recoil/cardAtom';
+import { cardAtom } from '@/app/atoms/cardAtom'
+import { useAtom } from 'jotai'
+import { useUser } from '@clerk/nextjs'
 
 
 export interface cardPreviewType {
@@ -29,10 +31,11 @@ interface cardDetailsType {
 }
 const AddedCards = () => {
 
+  const {user} = useUser();
   const [pin, setPin] = useState("");
   const [cardId, setCardId] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [cards, setCards] = useRecoilState<cardPreviewType[]>(cardAtom);
+  const [cards, setCards] = useAtom(cardAtom);
   const [loading, setLoading] = useState(false);
   const [isDetailsLoading, setIsDetailsLoading] = useState(false)
   const [error, setError] = useState("");
@@ -92,6 +95,10 @@ const AddedCards = () => {
       try {
         setDeletingCardId(cardId);
         const res = await axios.delete(`api/users/delete/card/${cardId}`,)
+        
+        const updatedCards = cards.filter(card => card._id !==cardId);
+        setCards(updatedCards);
+        
         toast.success(res.data.message);
         setDeletingCardId(null);
       } catch (error) {
@@ -99,6 +106,17 @@ const AddedCards = () => {
         toast.error("Error deleting card!");
         setDeletingCardId(null);
       }
+  }
+
+  async function handleSendEmail(){
+    try {
+      const res = await axios.post("api/users/send-email",{email:user?.primaryEmailAddress?.emailAddress})
+      toast.success(res.data.message);
+      
+    } catch (error) {
+      console.error("Error sending Email!",error);
+      toast.error("Error sending email!");
+    }
   }
 
   // useEffect(() => {
@@ -177,7 +195,11 @@ const AddedCards = () => {
                 </InputOTP>
                 {isDetailsLoading && <div className='text-center w-full'><ClipLoader size={"16px"} color='gray' /></div>}
                 {error && !isDetailsLoading && <p className='text-center text-sm text-red-700'>{error}</p>}
-                <p className='text-xs md:text-sm text-center'>Forget pin! <span className='text-blue-600 hover:underline cursor-pointer'>reset</span></p>
+                <p className='text-xs md:text-sm text-center'>Forget pin! 
+                  <span 
+                  onClick={handleSendEmail}
+                  className='text-blue-600 hover:underline cursor-pointer'>reset</span>
+                </p>
               </div>
               }
             </div>

@@ -1,3 +1,4 @@
+'use client'
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { GoTrash } from 'react-icons/go'
@@ -9,9 +10,12 @@ import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { CopyIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa';
+import { useAtom } from 'jotai';
+import { phraseAtom } from '@/app/atoms/phraseAtom';
+import { useUser } from '@clerk/nextjs';
 
 
-interface phrasePreviewType {
+export interface phrasePreviewType {
   _id: string;
   walletName: string;
   phrase: string;
@@ -24,10 +28,11 @@ interface phraseDetailType {
 
 const AddedSecrets = () => {
 
+  const {user} = useUser();
   const [pin, setPin] = useState("");
   const [phraseId, setPhraseId] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [phrases, setPhrases] = useState<phrasePreviewType[]>([])
+  const [phrases, setPhrases] = useAtom(phraseAtom);
   const [loading, setLoading] = useState(false)
   const [isDetailsLoading, setIsDetailsLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -85,6 +90,9 @@ const AddedSecrets = () => {
     try {
       setDeletingPhraseId(phraseId);
       const res = await axios.delete(`api/users/delete/secret-phrase/${phraseId}`);
+
+      const updatedPhrases = phrases.filter(phrase => phrase._id !== phraseId);
+      setPhrases(updatedPhrases);
       toast.success(res.data.message);
       setDeletingPhraseId(null);
     } catch (error) {
@@ -92,6 +100,18 @@ const AddedSecrets = () => {
       toast.error("Error deleting phrase!")
     }
   }
+
+  
+    async function handleSendEmail(){
+      try {
+        const res = await axios.post("api/users/send-email",{email:user?.primaryEmailAddress?.emailAddress})
+        toast.success(res.data.message);
+        
+      } catch (error) {
+        console.error("Error sending Email!",error);
+        toast.error("Error sending email!");
+      }
+    }
 
   return (
     <div className='shadow-sm shadow-purple-900 h-screen w-full md:w-3/5 rounded px-2 sm:px-4 pb-4 flex flex-col gap-3 overflow-hidden overflow-y-auto'>
@@ -157,7 +177,11 @@ const AddedSecrets = () => {
                 </InputOTP>
                 {isDetailsLoading && <div className='text-center w-full'><ClipLoader size={"16px"} color='gray' /></div>}
                 {error && !isDetailsLoading && <p className='text-center text-sm text-red-700'>{error}</p>}
-                <p className='text-xs md:text-sm text-center'>Forget pin! <span className='text-blue-600 hover:underline cursor-pointer'>reset</span></p>
+                <p className='text-xs md:text-sm text-center'>Forget pin! 
+                  <span 
+                  onClick={handleSendEmail}
+                  className='text-blue-600 hover:underline cursor-pointer'>reset</span>
+                </p>
               </div>
             </div>
           </DialogHeader>

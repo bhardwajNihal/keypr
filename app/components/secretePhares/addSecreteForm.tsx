@@ -4,7 +4,8 @@ import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
-
+import { useSetAtom } from "jotai";
+import { phraseAtom } from "@/app/atoms/phraseAtom";
 
 interface FormValues {
     walletName : string;
@@ -14,6 +15,7 @@ interface FormValues {
 const AddSecretForm = () => {
 
   const [loading, setLoading] = useState(false);
+  const setPhrases = useSetAtom(phraseAtom);
 
   const {
     register,
@@ -29,6 +31,10 @@ const AddSecretForm = () => {
     try {
       setLoading(true)
       const res = await axios.post("/api/users/add/secret-phrase",data);
+
+      const updatedPhrases = await axios.get("api/users/preview/secret-phrases");
+      setPhrases(updatedPhrases.data.secretPhrases)
+
       toast.success(res.data.message);
       setLoading(false)
       reset()

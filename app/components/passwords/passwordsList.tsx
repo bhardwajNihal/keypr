@@ -1,3 +1,4 @@
+'use client'
 import { RiLock2Fill } from "react-icons/ri";
 import React, { useEffect, useState } from 'react'
 import axios from "axios";
@@ -9,9 +10,12 @@ import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { CopyIcon } from "lucide-react";
 import { FaArrowLeft } from "react-icons/fa";
 import toast from "react-hot-toast";
+import { useAtom } from "jotai";
+import { passwordAtom } from "@/app/atoms/passwordAtom";
+import { useUser } from "@clerk/nextjs";
 // import toast from "react-hot-toast";
 
-interface passwordPreviewType {
+export interface passwordPreviewType {
   _id: string,
   site: string,
   username: string,
@@ -26,10 +30,11 @@ interface passwordDetailType {
 
 const AddedPasswords = () => {
 
+  const {user} = useUser();
   const [pin, setPin] = useState("");
   const [passwordId, setPasswordId] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [passwords, setPasswords] = useState<passwordPreviewType[]>([])
+  const [passwords, setPasswords] = useAtom(passwordAtom);
   const [loading, setLoading] = useState(false);
   const [isDetailsLoading, setIsDetailsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -49,7 +54,7 @@ const AddedPasswords = () => {
       }
     }
     fetchPasswords();
-  }, [])
+  }, [setPasswords])
 
   useEffect(() => {
     if (pin.length === 4 && passwordId !== null) {
@@ -87,11 +92,24 @@ const AddedPasswords = () => {
     try {
       setDeletingPasswordId(passwordId);
       const res = await axios.delete(`/api/users/delete/password/${passwordId}`);
+      const updatedPasswords = passwords.filter(pwd => pwd._id !== passwordId);
+      setPasswords(updatedPasswords);
       toast.success(res.data.message);
       setDeletingPasswordId(null);
     } catch (error) {
       console.error("Error deleting Password!",error);
       toast.error("Error deleting password!")
+    }
+  }
+
+  async function handleSendEmail(){
+    try {
+      const res = await axios.post("api/users/send-email",{email:user?.primaryEmailAddress?.emailAddress})
+      toast.success(res.data.message);
+      
+    } catch (error) {
+      console.error("Error sending Email!",error);
+      toast.error("Error sending email!");
     }
   }
 
@@ -166,7 +184,11 @@ const AddedPasswords = () => {
                 </InputOTP>
                 {isDetailsLoading && <div className='text-center w-full'><ClipLoader size={"16px"} color='gray' /></div>}
                 {error && !isDetailsLoading && <p className='text-center text-sm text-red-700'>{error}</p>}
-                <p className='text-xs md:text-sm text-center'>Forget pin! <span className='text-blue-600 hover:underline cursor-pointer'>reset</span></p>
+                <p className='text-xs md:text-sm text-center'>Forget pin! 
+                  <span 
+                  onClick={handleSendEmail}
+                  className='text-blue-600 hover:underline cursor-pointer'>reset</span>
+                </p>
               </div>
             </div>
           </DialogHeader>

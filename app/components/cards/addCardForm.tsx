@@ -4,7 +4,8 @@ import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
-
+import { cardAtom } from "@/app/atoms/cardAtom";
+import { useSetAtom } from "jotai";
 
 interface FormValues {
   title: string;
@@ -21,6 +22,7 @@ const AddCardForm = () => {
   // const cvvRef = useRef<HTMLInputElement>(null)
 
   const [loading, setLoading] = useState(false);
+  const setCards = useSetAtom(cardAtom);
 
   const {
     register,
@@ -44,10 +46,12 @@ const AddCardForm = () => {
     // finally making API call
     try {
       setLoading(true);
-      const res = await axios.post("/api/users/add/card",payload);
-      
+      const added = await axios.post("/api/users/add/card",payload);
+      // updating the state with update previews
+      const preview = await axios.get("api/users/preview/cards");
+      setCards(preview.data.cards)
       reset()
-      toast.success(res.data.message);
+      toast.success(added.data.message);
       setLoading(false);
     } catch (error) {
       console.error("error submitting form data!, ERROR : ",error);

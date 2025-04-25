@@ -67,10 +67,9 @@ Todos :
 
         # testing routes ✅
 
-        #finally displaying full unmasked details to the frontend
-        ** forgot pin  
+        #finally displaying full unmasked details to the frontend✅✅
 
-        ** Ui tweekings
+        ** Ui tweekings✅
 
 // frontend
         i. react hook form form validation for : 
@@ -79,12 +78,15 @@ Todos :
             - phrase✅
         ii. displaying partial details in the details section✅
         iii. when clicked, displaying popup for entering pin✅
-        iv. once pin is validated, showing full card details.
-        v. adding copy,delete options.
+        iv. once pin is validated, showing full card details.✅
+        v. adding copy,delete options.✅
+        vi. reset pin functioncality✅
 
     # Finally 
-        -Reset pin functionality, 
-        - email setup >> nodemailer >> random hash is generated >> stored in db >> sent to the email
-        - route to send email
-            - 1st session is validated >> custom reset-token validated
-            - after all the validation >> the pin is finally reset. 
+        -Reset pin functionality, ✅✅
+        - email setup >> nodemailer >> random hash is generated >> stored in db >> sent to the email✅✅
+        - api route to send email✅
+        - Frontend route to reset pin.
+        - api route to reset pin.✅
+            - custom reset-token validated
+            - after all the validation >> the pin is finally reset.✅

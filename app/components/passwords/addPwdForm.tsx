@@ -4,7 +4,8 @@ import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
-
+import { useSetAtom } from "jotai";
+import { passwordAtom } from "@/app/atoms/passwordAtom";
 
 interface FormValues {
   site : string;
@@ -15,6 +16,7 @@ interface FormValues {
 const AddPasswordForm = () => {
 
   const [loading, setLoading] = useState(false);
+  const setPasswords = useSetAtom(passwordAtom);
 
   const {
     register,
@@ -24,11 +26,15 @@ const AddPasswordForm = () => {
 
   const onSubmit = async(data: FormValues) => {
     
-    console.log("Form Submitted:", data);
+    // console.log("Form Submitted:", data);
     // finally making API call
     try {
       setLoading(true)
       const res = await axios.post("/api/users/add/password",data);
+
+      //fetching updated preview list and updating the state
+      const updatedPasswords = await axios.get("/api/users/preview/passwords")
+      setPasswords(updatedPasswords.data.passwords)
       toast.success(res.data.message);
       setLoading(false);
     } catch (error) {
