@@ -32,20 +32,20 @@ export default function Navbar() {
             </span>
         </div>
 
-        <div className="text-purple-100"><MenuIcon className="sm:hidden" /></div>
+        {/* <div className="text-purple-100"><MenuIcon className="sm:hidden" /></div> */}
 
-        <div className="options className sm:flex gap-8 items-center text-sm hidden sm:block">
+        <div className="options className flex gap-8 items-center text-sm">
 
             <SignedOut>
                 <ul className="flex items-center gap-4">
-                    <Link href={'#home'} scroll={true} ><li className="hover:underline cursor-pointer">Home</li></Link>
-                    <Link href={'#features'} scroll={true}><li className="hover:underline cursor-pointer">Features</li></Link>
-                    <Link href={'#about'} scroll={true}><li className="hover:underline cursor-pointer">FAQs</li></Link>
+                    <Link href={'#home'} scroll={true} ><li className="hover:underline cursor-pointer hidden md:block">Home</li></Link>
+                    <Link href={'#features'} scroll={true}><li className="hover:underline cursor-pointer hidden md:block">Features</li></Link>
+                    <Link href={'#about'} scroll={true}><li className="hover:underline cursor-pointer hidden md:block">FAQs</li></Link>
                 </ul>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="sm">
-                            <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                            <Sun className="h-[1rem] md:h-[1.2rem] w-[1rem] md:w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                             <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                             <span className="sr-only">Toggle theme</span>
                         </Button>
@@ -62,7 +62,7 @@ export default function Navbar() {
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <div className="bg-purple-600 px-8 rounded py-2 text-white hover:bg-purple-700"><SignInButton /></div>
+                <div className="border border-purple-400 text-purple-400 px-4 py-2 hover:bg-purple-500 hover:text-white rounded text-sm sm:bg-purple-600 sm:px-8 sm:rounded sm:text-white sm:hover:bg-purple-700"><SignInButton /></div>
             </SignedOut>
             <SignedIn>
 
