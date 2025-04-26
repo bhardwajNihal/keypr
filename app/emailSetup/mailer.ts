@@ -1,17 +1,22 @@
-// Nodemailer is a Node.js library that lets us send emails from your server.
-import nodemailer from "nodemailer";
+// will be using resend to send emails
 import bcrypt from "bcrypt";
 import { ConnectToDB } from "../Db/dbConnection";
 import { auth } from "@clerk/nextjs/server";
 import { Pin } from "../models/securityPin.model";
+import {Resend} from 'resend'
 
 ConnectToDB();
 
-// basic setup for sending email using nodemailer
+// resend instance
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+//function to send email
 export async function SendEmail(email: string | undefined) {
     
+  // check if email provided
   if (!email) throw new Error("Email is required.");
 
+  // verify session
   try {
     const { userId } = await auth();
     
@@ -19,6 +24,7 @@ export async function SendEmail(email: string | undefined) {
       throw new Error("Unauthorized Request")
     }
 
+    // hash a token >> store it to db assigning an expiry
     const hashedToken = await bcrypt.hash(userId.toString(), 10);
     
     await Pin.findOneAndUpdate(
@@ -28,44 +34,30 @@ export async function SendEmail(email: string | undefined) {
         forgetPinExpiry: Date.now() + 3600000, //1 hr
       }
     );
-    
 
-    // Will be using Mailtrap
-    // Mailtrap is a service that catches emails sent from development environments,
-    //  so they don’t go to real users. It gives us a sandbox inbox to preview emails safely.
-    // configure it , and set user and pass provided,
-    const transport = nodemailer.createTransport({
-      host: "sandbox.smtp.mailtrap.io",
-      port: 2525,
-      auth: {
-        user: process.env.MAILTRAP_USERNAME,
-        pass: process.env.MAILTRAP_PASSWORD,
-      },
-    });
-    
-    const mailOptions = {
-      from: '"Maddison Foo Koch 👻" <maddison53@ethereal.email>', // sender address
-      to: email, // list of receivers
-      subject: "Reset your pin.", // Subject line
-      text: "Hello world?", // plain text body
+    // finally send email using resend instance
+
+    const resetLink = `${process.env.NEXT_PUBLIC_DOMAIN}/reset-pin?token=${hashedToken}`;
+
+    const response = await resend.emails.send({
+      from: process.env.EMAIL_FROM!,
+      to: email,
+      subject: 'Reset your PIN',
       html: `
-      <p>Click 
-        <a 
-        classname="px-6 py-2 bg-purple-600 text-white rounded"
-        href="${process.env.NEXT_PUBLIC_DOMAIN}/reset-pin?token=${hashedToken}">here</a>
-        to reset you pin.
-      </p> 
-      <br />
-       OR 
-       <br /> 
-       Copy paste the link below in your browser tab
-       <br/>
-       ${process.env.NEXT_PUBLIC_DOMAIN}/reset-pin?token=${hashedToken}`,
-    };
+        <p>Click 
+          <a href="${resetLink}" style="color: white; background: #7e22ce; padding: 10px 15px; border-radius: 6px; text-decoration: none;">
+            here
+          </a> 
+          to reset your PIN.
+        </p>
+        <br />
+        <p>Or copy and paste this link in your browser:</p>
+        <code>${resetLink}</code>
+      `,
+    });
 
-    const mailResponse = await transport.sendMail(mailOptions);
-    
-    return mailResponse;
+    return response;
+
   } catch (error) {
     throw new Error("Error sending email!" + error);
   }
