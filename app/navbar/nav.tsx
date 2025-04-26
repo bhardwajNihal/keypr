@@ -3,7 +3,7 @@
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { MdVpnKey } from "react-icons/md";
 
-import { MenuIcon, Moon, Sun } from "lucide-react"
+import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 
 import { Button } from "@/app/components/ui/button"
@@ -32,7 +32,6 @@ export default function Navbar() {
             </span>
         </div>
 
-        {/* <div className="text-purple-100"><MenuIcon className="sm:hidden" /></div> */}
 
         <div className="options className flex gap-8 items-center text-sm">
 
